@@ -11,20 +11,20 @@ Personal homeserver running on Ubuntu Server, managed via Docker Compose, access
 | [Uptime Kuma](https://github.com/louislam/uptime-kuma) | Uptime / service health monitoring |
 | [Nextcloud](https://nextcloud.com/) | Self-hosted cloud storage |
 | [Tailscale](https://tailscale.com/) | Zero-config VPN mesh for remote access |
-| Jellyfin | Media server — **not yet set up**, planned |
-| Watchtower | Auto-updates containers — **skipped for now**, doing manual updates until We actually understand `docker compose` update flow |
+| Jellyfin | Media server . **not yet set up**, planned |
+| Watchtower | Auto-updates containers . **skipped for now**, doing manual updates until We actually understand `docker compose` update flow |
 
 ## Table of Contents
 
 - [Prerequisites](#prerequisites)
 - [1. Base OS Setup](#1-base-os-setup)
-- [2. Networking — Static IP](#2-networking--static-ip)
+- [2. Networking . Static IP](#2-networking--static-ip)
 - [3. Hostname](#3-hostname)
 - [4. SSH](#4-ssh)
 - [5. Firewall (UFW)](#5-firewall-ufw)
 - [6. Fail2ban](#6-fail2ban)
 - [7. Docker](#7-docker)
-- [8. Remote Access — Tailscale](#8-remote-access--tailscale)
+- [8. Remote Access . Tailscale](#8-remote-access--tailscale)
 - [9. Portainer](#9-portainer)
 - [10. Homepage](#10-homepage)
 - [11. Uptime Kuma](#11-uptime-kuma)
@@ -41,7 +41,7 @@ Personal homeserver running on Ubuntu Server, managed via Docker Compose, access
 
 ## 1. Base OS Setup
 
-Install the Ubuntu Server ISO on the target machine. Standard install, no GUI needed — this is a headless server.
+Install the Ubuntu Server ISO on the target machine. Standard install, no GUI needed. this is a headless server.
 
 Once installed, log in locally or find its IP to SSH in:
 
@@ -56,9 +56,9 @@ From another machine on the same network:
 ssh username@<server-ip>
 ```
 
-## 2. Networking — Static IP
+## 2. Networking . Static IP
 
-A server needs a fixed address — if your router hands it a new DHCP lease after a reboot, every bookmark, Tailscale config, and container `HOMEPAGE_ALLOWED_HOSTS` entry pointing at the old IP breaks.
+A server needs a fixed address. if your router hands it a new DHCP lease after a reboot, every bookmark, Tailscale config, and container `HOMEPAGE_ALLOWED_HOSTS` entry pointing at the old IP breaks.
 
 Ubuntu Server uses **netplan** for network config.
 
@@ -70,13 +70,13 @@ ip addr
 
 Wireless interfaces are usually named `wlan0` / `wlo1`, wired interfaces `eth0` / `eno1`.
 
-2. Edit the netplan config (the exact filename varies by install — check `/etc/netplan/`):
+2. Edit the netplan config (the exact filename varies by install. check `/etc/netplan/`):
 , not just the command
 ```bash
 sudo nano /etc/netplan/50-cloud-init.yaml
 ```
 
-3. Example config — **replace every placeholder below with your own values**:
+3. Example config : **replace every placeholder below with your own values**:
 
 ```yaml
 network:
@@ -102,7 +102,7 @@ network:
         addresses: [1.1.1.1, 8.8.8.8]
 ```
 
-Your actual addresses, gateway, and subnet depend on your router — check with `ip addr` and `ip route` first, don't copy these values blindly.
+Your actual addresses, gateway, and subnet depend on your router. check with `ip addr` and `ip route` first, don't copy these values blindly.
 
 Apply it:
 
@@ -129,7 +129,7 @@ sudo systemctl enable --now ssh
 
 ```bash
 sudo apt install ufw -y
-sudo ufw allow 22/tcp     # SSH — do this BEFORE enabling, or you'll lock yourself out
+sudo ufw allow 22/tcp     # SSH . do this BEFORE enabling, or you'll lock yourself out
 sudo ufw enable
 sudo ufw status           # should show "active"
 ```
@@ -164,7 +164,7 @@ Confirm Compose is available (ships with Docker as a plugin now, no separate ins
 docker compose version
 ```
 
-Set up the directory structure — one subdirectory per service, each holding its own `compose.yml`:
+Set up the directory structure. one subdirectory per service, each holding its own `compose.yml`:
 
 ```bash
 sudo mkdir -p /opt/docker/{portainer,watchtower,nextcloud,jellyfin,homepage,uptime-kuma}
@@ -173,7 +173,7 @@ sudo chown -R $USER:$USER /opt/docker
 
 `/opt` is root-owned by default; the `chown` gives your user write access without needing `sudo` for every edit.
 
-## 8. Remote Access — Tailscale
+## 8. Remote Access . Tailscale
 
 [Tailscale](https://tailscale.com/) creates a private mesh VPN between your devices using WireGuard, so you can reach your server from anywhere without port-forwarding or exposing it to the raw internet.
 
@@ -182,7 +182,7 @@ curl -fsSL https://tailscale.com/install.sh | sh
 sudo tailscale up
 ```
 
-Authenticate via Google, GitHub, or another supported identity provider. Repeat `tailscale up` on your main PC (or any device you want connected) using the same account. The Tailscale admin dashboard lists every connected device's Tailscale IP — use that IP, not your LAN IP, to reach the server from outside your home network.
+Authenticate via Google, GitHub, or another supported identity provider. Repeat `tailscale up` on your main PC (or any device you want connected) using the same account. The Tailscale admin dashboard lists every connected device's Tailscale IP . use that IP, not your LAN IP, to reach the server from outside your home network.
 
 **Quick test** before setting up real services:
 
@@ -230,7 +230,7 @@ sudo ufw allow 9443/tcp
 
 Access at `https://<server-ip>:9443`.
 
-Your browser will show a certificate warning — that's expected, it's because Portainer generates a self-signed cert and your browser doesn't trust it by default. Click through (Advanced → Proceed). This is safe on your own LAN/Tailscale network; it would **not** be safe to click through blindly on a random public site.
+Your browser will show a certificate warning . that's expected, it's because Portainer generates a self-signed cert and your browser doesn't trust it by default. Click through (Advanced → Proceed). This is safe on your own LAN/Tailscale network.
 
 On first load, set your admin username/password. If it asks for a setup token, retrieve it with:
 
@@ -238,7 +238,7 @@ On first load, set your admin username/password. If it asks for a setup token, r
 docker logs portainer
 ```
 
-Look for a line like `Setup_token = <token>`. Skip the "Edge compute" prompt — you don't need it for this setup.
+Look for a line like `Setup_token = <token>`. Skip the "Edge compute" prompt . you don't need it for this setup.
 
 Confirm it's reachable over Tailscale too: `https://<tailscale-ip>:9443`.
 
@@ -305,11 +305,11 @@ sudo ufw allow 3001/tcp
 
 Access at `http://<server-ip>:3001`. Choose SQLite as the database on first run and create your account.
 
-Add each service you've set up so far as a monitor — URL as `<server-ip>:<port>`, name it after the container. If checking an HTTPS service with a self-signed cert (like Portainer), tick **"Ignore TLS/SSL errors"** or the check will always show as down. Double-check `http` vs `https` per service — Portainer is https, everything else here is currently http.
+Add each service you've set up so far as a monitor . URL as `<server-ip>:<port>`, name it after the container. If checking an HTTPS service with a self-signed cert (like Portainer), tick **"Ignore TLS/SSL errors"** or the check will always show as down. Double-check `http` vs `https` per service . Portainer is https, everything else here is currently http.
 
 ## 12. Nextcloud
 
-[Nextcloud](https://nextcloud.com/) is self-hosted cloud storage — your own Google Drive equivalent.
+[Nextcloud](https://nextcloud.com/) is self-hosted cloud storage . your own Google Drive equivalent.
 
 ```bash
 sudo mkdir -p /opt/docker/nextcloud
@@ -317,7 +317,7 @@ sudo chown -R $USER:$USER /opt/docker/nextcloud
 cd /opt/docker/nextcloud
 ```
 
-Secrets go in a `.env` file, not directly in `compose.yml` — keeps them out of version control if you `.gitignore` the file (see the note at the bottom of this section).
+Secrets go in a `.env` file, not directly in `compose.yml` . keeps them out of version control if you `.gitignore` the file (see the note at the bottom of this section).
 
 ```bash
 nano .env
@@ -389,20 +389,20 @@ sudo ufw allow 8080/tcp
 
 Access at `http://<server-ip>:8080`. All your data lives in `/opt/docker/nextcloud` on the server (in the named Docker volumes `db` and `nextcloud`).
 
-This is currently LAN/Tailscale-only over plain HTTP — fine for now since it's not exposed to the internet. If it's ever exposed publicly, it needs to sit behind **Caddy** (or another reverse proxy) with a real TLS certificate first — Nextcloud's own documentation requires HTTPS for internet-facing instances. Nextcloud auth over plain HTTP on an open network is a credential-sniffing risk.
+This is currently LAN/Tailscale-only over plain HTTP . fine for now since it's not exposed to the internet. If it's ever exposed publicly, it needs to sit behind **Caddy** (or another reverse proxy) with a real TLS certificate first . Nextcloud's own documentation requires HTTPS for internet-facing instances. Nextcloud auth over plain HTTP on an open network is a credential-sniffing risk.
 
-> **`.env` files and git:** if this directory is a git repo, add `.env` to `.gitignore` right now, before your first commit. `git rm --cached .env` if you already committed it, then rotate both passwords — they're compromised the moment they hit a public repo.
+> **`.env` files and git:** if this directory is a git repo, add `.env` to `.gitignore` right now, before your first commit. `git rm --cached .env` if you already committed it, then rotate both passwords . they're compromised the moment they hit a public repo.
 
 ---
 
 ## Roadmap
 
 - [ ] Jellyfin media server
-- [ ] Watchtower (auto-updates) — deliberately deferred until I understand the manual `docker compose pull && docker compose up -d` update flow
+- [ ] Watchtower (auto-updates) . deliberately deferred until I understand the manual `docker compose pull && docker compose up -d` update flow
 - [ ] Caddy reverse proxy + real TLS certs for any service that might go internet-facing
-- [ ] Backups (currently none — `/opt/docker` is a single point of failure)
+- [ ] Backups (currently none . `/opt/docker` is a single point of failure)
 
 ## Notes
 
-- Everything here is reachable over LAN or Tailscale only. Nothing is exposed directly to the internet, which is why plain HTTP is currently tolerable for most services — it stops being tolerable the second anything is port-forwarded externally.
+- Everything here is reachable over LAN or Tailscale only. Nothing is exposed directly to the internet, which is why plain HTTP is currently tolerable for most services . it stops being tolerable the second anything is port-forwarded externally.
 - Every new container needs a matching `sudo ufw allow <port>/tcp` or it won't be reachable, even on LAN.
