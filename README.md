@@ -2,8 +2,6 @@
 
 Personal homeserver running on Ubuntu Server, managed via Docker Compose, accessed remotely over Tailscale.
 
-> ⚠️ **Before pushing this repo to GitHub:** scrub any real Wi-Fi passwords, MAC addresses, static IPs, or `.env` secrets from every file in this repo. Once something is in git history it's there permanently, even if you delete it in a later commit (`git log -p` or a clone from before the delete will still show it). Use `git-secrets` or just `grep -ri password .` before every push as a habit.
-
 ## Stack
 
 | Service | Purpose |
